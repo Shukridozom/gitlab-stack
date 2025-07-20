@@ -1,0 +1,85 @@
+  
+
+
+# docker inspect <image-name> --format='ENTRYPOINT: {{json .Config.Entrypoint}} CMD: {{json .Config.Cmd}}'
+
+
+  # gitlab-rails runner "puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token"
+
+  # gitlab-runner unregister --all-runners
+
+  # rm -f /etc/gitlab-runner/config.toml
+
+
+# sudo gitlab-runner register \
+#   --non-interactive \
+#   --url "https://gitlab.com/" \
+#   --token "$RUNNER_TOKEN" \
+#   --executor "docker" \
+#   --docker-image alpine:latest \
+#   --description "docker-runner"
+
+
+# gitlab-runner run
+
+
+
+# # Wait until GitLab API is ready
+# until curl -sf http://gitlab/-/readiness; do
+#   echo "⏳ Waiting for GitLab to be ready..."
+#   sleep 5
+# done
+
+# echo "✅ GitLab is ready!"
+
+getent hosts gitlab-runner | awk '{ print $1 }'
+getent hosts gitlab | awk '{ print $1 }'
+
+
+
+# volumes:
+#   shared-data:
+
+# services:
+#   gitlab:
+#     image: gitlab/gitlab-ce
+#     volumes:
+#       - shared-data:/shared
+
+#   gitlab-runner:
+#     image: gitlab/gitlab-runner
+#     volumes:
+#       - shared-data:/shared
+# # GitLab container writes a token to /shared/token.txt
+# # GitLab Runner reads it from /shared/token.txt
+
+
+docker inspect gitlab-with-runner-gitlab-runner:latest --format='ENTRYPOINT: {{json .Config.Entrypoint}} CMD: {{json .Config.Cmd}}'
+
+#!/bin/bash
+
+# gitlab-runner data directory
+DATA_DIR="/etc/gitlab-runner"
+CONFIG_FILE=${CONFIG_FILE:-$DATA_DIR/config.toml}
+# custom certificate authority path
+CA_CERTIFICATES_PATH=${CA_CERTIFICATES_PATH:-$DATA_DIR/certs/ca.crt}
+LOCAL_CA_PATH="/usr/local/share/ca-certificates/ca.crt"
+
+update_ca() {
+  echo "Updating CA certificates..."
+  cp "${CA_CERTIFICATES_PATH}" "${LOCAL_CA_PATH}"
+  update-ca-certificates --fresh >/dev/null
+}
+
+if [ -f "${CA_CERTIFICATES_PATH}" ]; then
+  # update the ca if the custom ca is different than the current
+  cmp --silent "${CA_CERTIFICATES_PATH}" "${LOCAL_CA_PATH}" || update_ca
+fi
+
+# launch gitlab-runner passing all arguments
+exec gitlab-runner "$@"
+
+
+
+docker exec <gitlab_container_name> bash -c "grep 'Password:' /etc/gitlab/initial_root_password | awk '{print \$2}'"
+

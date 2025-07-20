@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  gitlab:
+    build: ./gitlab
+    # image: shukridozom/self-hosted-gitlab:1.0.0
+    container_name: gitlab
+    restart: always
+    ports:
+      - "${GITLAB_PORT}:80"
+    volumes:
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+      - gitlab_shared_data:/shared
+    networks:
+      - ${GITLAB_NET}
+    shm_size: '256m'
+
+  gitlab-runner:
+    build: ./gitlab-runner
+    # image: shukridozom/self-hosted-gitlab-runner:1.0.0
+    privileged: true
+    container_name: gitlab-runner
+    depends_on:
+      - gitlab
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitlab_shared_data:/shared
+    environment:
+      GITLAB_NET: ${GITLAB_NET}
+    networks:
+      - ${GITLAB_NET}
+
+networks:
+  gitlabnet:
+    name: ${GITLAB_NET}
+    driver: bridge
+
+volumes:
+  gitlab_config:
+  gitlab_logs:      
+  gitlab_data:
+  gitlab_shared_data:
