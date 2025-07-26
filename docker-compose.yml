@@ -2,9 +2,9 @@ version: '3.9'
 
 services:
   gitlab:
-    build: ./gitlab
-    # image: shukridozom/self-hosted-gitlab:1.0.0
-    container_name: gitlab
+    # build: ./gitlab
+    image: shukridozom/gitlab-server:1.0.0
+    container_name: gitlab-server
     restart: always
     ports:
       - "${GITLAB_PORT}:80"
@@ -18,10 +18,10 @@ services:
     shm_size: '256m'
 
   gitlab-runner:
-    build: ./gitlab-runner
-    # image: shukridozom/self-hosted-gitlab-runner:1.0.0
+    # build: ./gitlab-runner
+    image: shukridozom/gitlab-agent:1.0.0
     privileged: true
-    container_name: gitlab-runner
+    container_name: gitlab-agent
     depends_on:
       - gitlab
     volumes:
