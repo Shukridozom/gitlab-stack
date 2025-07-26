@@ -39,6 +39,29 @@ networks:
 
 volumes:
   gitlab_config:
-  gitlab_logs:      
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${GITLAB_VOL_CONFIG_PATH}
+
+  gitlab_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${GITLAB_VOL_LOGS_PATH}
+      
   gitlab_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${GITLAB_VOL_DATA_PATH}
+
   gitlab_shared_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${GITLAB_VOL_SHARED_DATA_PATH}
